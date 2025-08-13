@@ -1,1 +1,165 @@
 
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>What-If I Had Invested? — Matrix Edition</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Matrix rain background -->
+  <canvas id="matrix-bg" aria-hidden="true"></canvas>
+
+  <header class="header">
+    <h1 class="glow">WHAT-IF I HAD INVESTED?<span class="cursor">▌</span></h1>
+    <p class="sub">Client-side • No frameworks • Neon green trust</p>
+  </header>
+
+  <main class="container">
+    <section class="panel controls">
+      <h2 class="panel-title">Inputs</h2>
+
+      <div class="field">
+        <label for="amount">Amount (€)</label>
+        <input id="amount" type="number" min="0" step="50" value="10000" />
+      </div>
+
+      <div class="field row">
+        <label class="switch">
+          <input id="recurringToggle" type="checkbox" />
+          <span class="slider"></span>
+        </label>
+        <label for="frequency" class="inline-label">Recurring</label>
+        <select id="frequency" disabled>
+          <option value="365">Daily</option>
+          <option value="52">Weekly</option>
+          <option value="12" selected>Monthly</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="horizon">Investment horizon: <span id="horizonOut">40</span> years</label>
+        <input id="horizon" type="range" min="5" max="50" value="40" />
+      </div>
+
+      <div class="field">
+        <label for="expReturn">Expected annual return (%)</label>
+        <input id="expReturn" type="number" step="0.1" value="8" />
+        <div class="hint">Ignored if Historical is ON</div>
+      </div>
+
+      <div class="field row">
+        <label class="switch">
+          <input id="inflToggle" type="checkbox" />
+          <span class="slider"></span>
+        </label>
+        <label for="inflation" class="inline-label">Inflation</label>
+        <input id="inflation" type="number" step="0.1" value="2" disabled />
+        <span class="suffix">%</span>
+      </div>
+
+      <div class="field row">
+        <label class="switch">
+          <input id="taxToggle" type="checkbox" />
+          <span class="slider"></span>
+        </label>
+        <label for="taxRate" class="inline-label">Capital gains tax (one-time at end)</label>
+        <input id="taxRate" type="number" step="0.1" value="27.5" disabled />
+        <span class="suffix">%</span>
+      </div>
+
+      <div class="field row">
+        <label class="switch">
+          <input id="histToggle" type="checkbox" />
+          <span class="slider"></span>
+        </label>
+        <label class="inline-label">Historical simulation (MSCI World sampler)</label>
+      </div>
+
+      <div class="field sims">
+        <label for="sims">Monte Carlo runs</label>
+        <input id="sims" type="number" min="100" max="5000" step="100" value="1000" />
+        <div class="hint">Used only for Monte Carlo</div>
+      </div>
+
+      <div class="buttons">
+        <button id="runSingle" class="btn primary">Single Path</button>
+        <button id="runMC" class="btn secondary">Monte Carlo</button>
+        <button id="clear" class="btn ghost">Clear Chart</button>
+      </div>
+    </section>
+
+    <section class="panel summary">
+      <h2 class="panel-title">Output</h2>
+
+      <div class="cards">
+        <div class="card big">
+          <div class="label">Future value (nominal)</div>
+          <div id="fvNominal" class="value">—</div>
+        </div>
+
+        <div id="fvRealCard" class="card hidden">
+          <div class="label">Future value (real)</div>
+          <div id="fvReal" class="value">—</div>
+        </div>
+
+        <div id="fvAfterTaxCard" class="card hidden">
+          <div class="label">Future value (after tax)</div>
+          <div id="fvAfterTax" class="value">—</div>
+        </div>
+
+        <div id="mcStats" class="mc-grid hidden">
+          <div class="stat">
+            <div class="tag">Median</div>
+            <div id="mcMedian" class="statv">—</div>
+          </div>
+          <div class="stat">
+            <div class="tag">P10</div>
+            <div id="mcP10" class="statv">—</div>
+          </div>
+          <div class="stat">
+            <div class="tag">P90</div>
+            <div id="mcP90" class="statv">—</div>
+          </div>
+          <div class="stat">
+            <div class="tag">Best</div>
+            <div id="mcBest" class="statv">—</div>
+          </div>
+          <div class="stat">
+            <div class="tag">Worst</div>
+            <div id="mcWorst" class="statv">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note">
+        Historical mode samples random years from a fixed MSCI World annual returns set (incl. crashes + booms). All calculations are local in your browser.
+      </div>
+    </section>
+
+    <section class="panel chartbox">
+      <div class="chart-header">
+        <div id="modeBadge" class="badge">Awaiting run…</div>
+        <div id="legend" class="legend">
+          <span class="key key-green"></span> Growth
+          <span class="sep"></span>
+          <span class="key key-blue"></span> Median
+          <span class="sep"></span>
+          <span class="key key-band"></span> P10–P90
+        </div>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="chart" width="1200" height="600" aria-label="Investment chart"></canvas>
+        <div id="tooltip" class="tooltip hidden"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>Not financial advice. Values are hypothetical. Tax logic = one-time capital gains on profit at the end.</small>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
